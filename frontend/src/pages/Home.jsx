@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiDollarSign, FiPieChart, FiTag, FiShield, FiSmartphone, FiBarChart2, FiTrendingUp, FiCheck } from 'react-icons/fi';
+import { FiArrowRight, FiDollarSign, FiPieChart, FiTag, FiShield, FiSmartphone, FiBarChart2, FiTrendingUp, FiCheck, FiStar } from 'react-icons/fi';
 import { useInView } from '../hooks/useInView';
 
 const features = [

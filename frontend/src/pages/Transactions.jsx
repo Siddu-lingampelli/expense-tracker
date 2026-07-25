@@ -159,7 +159,7 @@ const Transactions = () => {
                     <p className="text-2xs text-secondary-foreground">{t.category} &middot; {format(new Date(t.date), 'MMM d, yyyy')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                <div className="flex items-center gap-2 flex-shrink-0 ml-2 sm:ml-4">
                   <span className={`text-sm tabular-nums ${t.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                     {t.type === 'income' ? '+' : '-'}{fmt(Math.abs(t.amount))}
                   </span>
@@ -181,7 +181,7 @@ const Transactions = () => {
         )}
 
         {data?.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+          <div className="flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 py-3 border-t border-border">
             <p className="text-xs text-secondary-foreground">
               Page {data.currentPage} of {data.totalPages} ({data.totalItems} transactions)
             </p>

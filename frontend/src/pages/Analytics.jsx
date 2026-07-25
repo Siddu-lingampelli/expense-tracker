@@ -55,7 +55,7 @@ const Analytics = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div>
           <h1 className="text-base font-medium text-foreground">Analytics</h1>
           <p className="text-xs text-secondary-foreground mt-0.5">Insights into your spending</p>

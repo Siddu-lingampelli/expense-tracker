@@ -214,7 +214,7 @@ const Home = () => {
         </section>
       </FadeSection>
 
-      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-between">
+      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-col sm:flex-row items-center justify-between gap-3">
         <span className="text-xs text-muted-foreground">&copy; 2024 $ monitor</span>
         <div className="flex items-center gap-4">
           <Link to="/login" className="text-xs text-secondary-foreground hover:text-foreground transition-colors">Sign in</Link>

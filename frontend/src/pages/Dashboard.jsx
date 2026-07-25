@@ -101,7 +101,7 @@ const Dashboard = () => {
         <AnimatedCard delay="stagger-3">
           <div className="border border-border rounded-md p-4 group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
             <h3 className="text-xs font-medium text-foreground mb-4">Income vs Expenses</h3>
-            <div className="h-64">
+            <div className="h-52 md:h-64">
               {barData && <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#EBEBEB' }, ticks: { callback: (v) => '$' + v } } } }} />}
             </div>
           </div>
@@ -109,7 +109,7 @@ const Dashboard = () => {
         <AnimatedCard delay="stagger-4">
           <div className="border border-border rounded-md p-4 group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
             <h3 className="text-xs font-medium text-foreground mb-4">Expense Categories</h3>
-            <div className="h-64 flex items-center justify-center">
+            <div className="h-52 md:h-64 flex items-center justify-center">
               {doughnutData && doughnutData.labels.length > 0 ? (
                 <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 8, padding: 12, font: { size: 11 } } } } }} />
               ) : (

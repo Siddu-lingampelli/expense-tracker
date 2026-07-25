@@ -44,8 +44,9 @@ const Analytics = () => {
   const getMonthlyData = () => {
     if (!transactions) return null;
     const md = {};
-    transactions.forEach(t => { const m = format(new Date(t.date), 'MMM yyyy'); if (!md[m]) md[m] = { income: 0, expense: 0 }; md[m][t.type] += t.amount; });
-    const labels = Object.keys(md).sort();
+    transactions.forEach(t => { const d = new Date(t.date); const m = format(d, 'MMM yyyy'); const k = d.getFullYear() * 12 + d.getMonth(); if (!md[k]) md[k] = { label: m, income: 0, expense: 0 }; md[k][t.type] += t.amount; });
+    const keys = Object.keys(md).sort((a, b) => a - b);
+    const labels = keys.map(k => md[k].label);
     return labels.length ? { labels, datasets: [
       { label: 'Income', data: labels.map(m => md[m].income), backgroundColor: '#16A34A', borderRadius: 2 },
       { label: 'Expenses', data: labels.map(m => md[m].expense), backgroundColor: '#DC2626', borderRadius: 2 },

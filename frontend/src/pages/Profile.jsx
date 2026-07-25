@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FiUser, FiLock, FiLogOut } from 'react-icons/fi';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 
 import api from '../utils/api';

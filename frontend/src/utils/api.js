@@ -222,12 +222,12 @@ function handleTransactions(method, path, body, params) {
     const monthlyMap = {};
     tx.forEach(t => {
       const d = new Date(t.date);
-      const month = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-      if (!monthlyMap[month]) monthlyMap[month] = { income: 0, expenses: 0 };
-      if (t.type === 'income') monthlyMap[month].income += t.amount;
-      else monthlyMap[month].expenses += Math.abs(t.amount);
+      const k = d.getFullYear() * 12 + d.getMonth();
+      if (!monthlyMap[k]) { monthlyMap[k] = { month: d.toLocaleString('en-US', { month: 'short', year: 'numeric' }), income: 0, expenses: 0 }; }
+      if (t.type === 'income') monthlyMap[k].income += t.amount;
+      else monthlyMap[k].expenses += Math.abs(t.amount);
     });
-    const monthlySummary = Object.entries(monthlyMap).map(([month, data]) => ({ month, ...data }));
+    const monthlySummary = Object.keys(monthlyMap).sort((a, b) => a - b).map(k => monthlyMap[k]);
 
     const categoryMap = {};
     tx.filter(t => t.type === 'expense').forEach(t => {
@@ -298,7 +298,7 @@ function handleTransactions(method, path, body, params) {
     return successResponse({ transactions: paginated, totalPages, totalItems, currentPage: page });
   }
 
-  const singleMatch = path.match(/^\/transactions\/([a-f0-9-]+)$/i);
+  const singleMatch = path.match(/^\/transactions\/([0-9a-z-]+)$/i);
   if (singleMatch && method === 'GET') {
     const t = allTx.find(tx => tx._id === singleMatch[1] && tx.user === auth.user._id);
     if (!t) throw makeError(404, 'Transaction not found');

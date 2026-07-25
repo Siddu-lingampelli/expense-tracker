@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import api from '../utils/api';
 
 const defaultCategories = [

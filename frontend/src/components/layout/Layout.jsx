@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useLocation, Link, NavLink } from 'react-router-dom';
+import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { FiDollarSign, FiPieChart, FiTag, FiUser, FiLogOut, FiMenu, FiX, FiGrid } from 'react-icons/fi';
@@ -14,7 +14,6 @@ const navItems = [
 const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {

@@ -34,15 +34,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <App />
             <ToastContainer
               position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
+              autoClose={4000}
+              hideProgressBar
+              newestOnTop
               closeOnClick
               rtl={false}
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme="colored"
+              theme="light"
             />
           </AuthProvider>
         </ThemeProvider>

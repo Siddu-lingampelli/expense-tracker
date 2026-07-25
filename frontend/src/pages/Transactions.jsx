@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FiPlus, FiSearch, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 import api from '../utils/api';
 
 const fmt = (v) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(v);
@@ -67,10 +68,19 @@ const Transactions = () => {
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
+  const handleDelete = async (id) => {
+    await api.delete(`/transactions/${id}`);
+    queryClient.invalidateQueries(['transactions']);
+    queryClient.invalidateQueries(['dashboard']);
+    toast.success('Transaction deleted');
+  };
+
   const handleBulkDelete = async () => {
     await api.delete('/transactions', { data: { ids: selected } });
     setSelected([]);
     queryClient.invalidateQueries(['transactions']);
+    queryClient.invalidateQueries(['dashboard']);
+    toast.success(`${selected.length} transactions deleted`);
   };
 
   const filtersActive = type !== 'all' || category !== 'all' || dateRange !== 'thismonth' || search;
@@ -166,7 +176,7 @@ const Transactions = () => {
                   <Link to={`/dashboard/transactions/${t._id}/edit`} className="text-muted-foreground hover:text-foreground transition-colors">
                     <FiEdit2 className="h-3.5 w-3.5" />
                   </Link>
-                  <button onClick={() => { setSelected([t._id]); handleBulkDelete(); }} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <button onClick={() => handleDelete(t._id)} className="text-muted-foreground hover:text-destructive transition-colors">
                     <FiTrash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>

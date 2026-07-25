@@ -89,5 +89,18 @@ select:focus-visible {
 }
 
 .Toastify__toast {
-  @apply rounded-lg text-sm font-medium shadow-lg;
+  @apply rounded-md text-sm shadow-md border border-border;
+  font-family: inherit;
+}
+.Toastify__toast-body {
+  @apply text-sm text-foreground p-0;
+}
+.Toastify__toast--success {
+  @apply border-l-2 border-l-success;
+}
+.Toastify__toast--error {
+  @apply border-l-2 border-l-destructive;
+}
+.Toastify__toast-icon {
+  @apply w-4 h-4;
 }

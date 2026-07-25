@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
   // Update password
   const updatePassword = async (currentPassword, newPassword) => {
     try {
-      await api.put('/user/update-password', {
+      await api.put('/auth/updatepassword', {
         currentPassword,
         newPassword,
       });

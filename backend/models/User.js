@@ -1,65 +1,92 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const db = require('../storage/db');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please add a name'],
-    trim: true,
-    maxlength: [50, 'Name cannot be more than 50 characters']
+const COLLECTION = 'users';
+
+function attachMethods(user) {
+  if (!user) return null;
+  return {
+    ...user,
+    matchPassword: async function (enteredPassword) {
+      return bcrypt.compare(enteredPassword, this.password);
+    },
+    getSignedJwtToken: function () {
+      return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE || '30d',
+      });
+    },
+    save: async function () {
+      if (this.password) {
+        const salt = bcrypt.genSaltSync(10);
+        this.password = bcrypt.hashSync(this.password, salt);
+      }
+      const updateData = { ...this };
+      delete updateData._id;
+      delete updateData.createdAt;
+      delete updateData.updatedAt;
+      delete updateData.matchPassword;
+      delete updateData.getSignedJwtToken;
+      delete updateData.save;
+      return db.update(COLLECTION, this._id, updateData);
+    }
+  };
+}
+
+const User = {
+  findById(id) {
+    const user = db.findById(COLLECTION, id);
+    if (!user) return null;
+    const { password, ...safe } = user;
+    return attachMethods(safe);
   },
-  email: {
-    type: String,
-    required: [true, 'Please add an email'],
-    unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please add a valid email'
-    ]
+
+  findOne(query) {
+    const user = db.findOne(COLLECTION, query);
+    if (!user) return null;
+    const { password, ...safe } = user;
+    return attachMethods(safe);
   },
-  password: {
-    type: String,
-    required: [true, 'Please add a password'],
-    minlength: 6,
-    select: false
+
+  create(data) {
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(data.password, salt);
+    const created = db.create(COLLECTION, {
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+      theme: 'light',
+      currency: 'USD'
+    });
+    const { password, ...safe } = created;
+    return attachMethods(safe);
   },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  createdAt: {
-    type: Date,
-    default: Date.now
+
+  findByIdAndUpdate(id, data, options = {}) {
+    const updateData = { ...data };
+    if (updateData.password) {
+      const salt = bcrypt.genSaltSync(10);
+      updateData.password = bcrypt.hashSync(updateData.password, salt);
+    }
+    if (updateData._id) delete updateData._id;
+    const updated = db.update(COLLECTION, id, updateData);
+    if (!updated) return null;
+    const { password, ...safe } = updated;
+    return attachMethods(safe);
   },
-  theme: {
-    type: String,
-    enum: ['light', 'dark'],
-    default: 'light'
+
+  findByIdAndDelete(id) {
+    const deleted = db.deleteOne(COLLECTION, id);
+    if (!deleted) return null;
+    const { password, ...safe } = deleted;
+    return safe;
   },
-  currency: {
-    type: String,
-    default: 'USD'
+
+  findByEmailWithPassword(email) {
+    const user = db.findOne(COLLECTION, { email });
+    if (!user) return null;
+    return attachMethods(user);
   }
-});
-
-// Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
-// Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Sign JWT and return
-userSchema.methods.getSignedJwtToken = function() {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-};
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

@@ -2,7 +2,12 @@
 node_modules/
 
 # Environment variables
-.env\n.env.local\n.env.*.local\n
+.env
+.env.local
+.env.*.local
+
+# Database (JSON file-based storage)
+backend/data/
 # Build output
 dist/
 build/

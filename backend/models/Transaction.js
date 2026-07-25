@@ -1,65 +1,119 @@
-const mongoose = require('mongoose');
+const db = require('../storage/db');
 
-const transactionSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  type: {
-    type: String,
-    enum: ['income', 'expense'],
-    required: true
-  },
-  amount: {
-    type: Number,
-    required: [true, 'Please add an amount'],
-    min: [0.01, 'Amount must be greater than 0']
-  },
-  category: {
-    type: String,
-    required: [true, 'Please select a category'],
-    enum: [
-      // Income categories - Capitalized to match frontend
-      'Salary', 'Freelance', 'Investments', 'Stocks', 'Bitcoin', 'Bank', 'YouTube', 'Other',
-      // Expense categories
-      'Food & Dining', 'Shopping', 'Housing', 'Transportation', 'Entertainment',
-      'Healthcare', 'Education', 'Utilities', 'Insurance', 'Personal Care',
-      'Gifts & Donations', 'Travel', 'Business'
-    ]
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  description: {
-    type: String,
-    maxlength: [200, 'Description cannot be more than 200 characters'],
-    trim: true
-  },
-  account: {
-    type: String,
-    default: 'Cash',
-    enum: ['Cash', 'Bank Account', 'Credit Card', 'Digital Wallet']
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+const COLLECTION = 'transactions';
+
+class QueryBuilder {
+  constructor(query) {
+    this._query = query;
+    this._sort = null;
+    this._select = null;
+    this._skip = null;
+    this._limit = null;
+    this._populate = null;
   }
-}, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
 
-// Add index for better query performance
-transactionSchema.index({ user: 1, date: -1 });
+  sort(sortStr) {
+    this._sort = sortStr;
+    return this;
+  }
 
-transactionSchema.pre('save', function(next) {
-  // Ensure amount is positive for both income and expense
-  this.amount = Math.abs(this.amount);
-  next();
-});
+  select(fields) {
+    this._select = fields;
+    return this;
+  }
 
-module.exports = mongoose.model('Transaction', transactionSchema);
+  skip(n) {
+    this._skip = n;
+    return this;
+  }
+
+  limit(n) {
+    this._limit = n;
+    return this;
+  }
+
+  populate(path) {
+    this._populate = path;
+    return this;
+  }
+
+  async exec() {
+    return db.findWithOptions(COLLECTION, this._query, {
+      sort: this._sort,
+      select: this._select,
+      skip: this._skip,
+      limit: this._limit,
+      populate: this._populate
+    });
+  }
+
+  then(resolve, reject) {
+    return this.exec().then(resolve, reject);
+  }
+}
+
+const Transaction = {
+  modelName: 'Transaction',
+
+  find(query = {}) {
+    return new QueryBuilder(query);
+  },
+
+  findOne(query) {
+    const item = db.findOne(COLLECTION, query);
+    if (!item) return null;
+    return attachMethods(item);
+  },
+
+  findById(id) {
+    const item = db.findById(COLLECTION, id);
+    if (!item) return null;
+    return attachMethods(item);
+  },
+
+  create(data) {
+    const normalized = { ...data };
+    if (normalized.amount) {
+      normalized.amount = Math.abs(Number(normalized.amount));
+    }
+    if (normalized.date && typeof normalized.date === 'string') {
+      normalized.date = new Date(normalized.date).toISOString();
+    }
+    return attachMethods(db.create(COLLECTION, normalized));
+  },
+
+  findByIdAndUpdate(id, data, options = {}) {
+    const updateData = { ...data };
+    if (updateData._id) delete updateData._id;
+    if (updateData.amount !== undefined) {
+      updateData.amount = Math.abs(Number(updateData.amount));
+    }
+    if (updateData.date && typeof updateData.date === 'string') {
+      updateData.date = new Date(updateData.date).toISOString();
+    }
+    const updated = db.update(COLLECTION, id, updateData);
+    if (!updated) return null;
+    return attachMethods(updated);
+  },
+
+  deleteMany(query) {
+    return db.deleteMany(COLLECTION, query);
+  },
+
+  countDocuments(query = {}) {
+    return db.count(COLLECTION, query);
+  }
+};
+
+function attachMethods(item) {
+  if (!item) return null;
+  const doc = {
+    ...item,
+    deleteOne: async function () {
+      return db.deleteOne(COLLECTION, this._id);
+    }
+  };
+  return doc;
+}
+
+module.exports = Transaction;

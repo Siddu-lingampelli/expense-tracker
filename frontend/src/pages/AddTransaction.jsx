@@ -15,12 +15,6 @@ const INCOME_CATEGORIES = [
   'Salary', 'Freelance', 'Investments', 'Stocks', 'Bitcoin', 'Bank', 'YouTube', 'Other'
 ];
 
-const CATEGORIES = [
-  'Food & Dining', 'Shopping', 'Housing', 'Transportation', 'Entertainment',
-  'Healthcare', 'Education', 'Utilities', 'Insurance', 'Personal Care',
-  'Gifts & Donations', 'Travel', 'Business', 'Other'
-];
-
 const AddTransaction = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();

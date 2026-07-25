@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
@@ -13,12 +13,6 @@ const EXPENSE_CATEGORIES = [
 
 const INCOME_CATEGORIES = [
   'Salary', 'Freelance', 'Investments', 'Stocks', 'Bitcoin', 'Bank', 'YouTube', 'Other'
-];
-
-const CATEGORIES = [
-  'Food & Dining', 'Shopping', 'Housing', 'Transportation', 'Entertainment',
-  'Healthcare', 'Education', 'Utilities', 'Insurance', 'Personal Care',
-  'Gifts & Donations', 'Travel', 'Business', 'Other'
 ];
 
 const EditTransaction = () => {

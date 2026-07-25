@@ -1,13 +1,15 @@
 {
   "name": "expense-tracker",
   "version": "1.0.0",
-  "description": "A MERN stack expense tracking application",
+  "description": "A full-stack expense tracking application",
   "main": "server.js",
   "scripts": {
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
     "client": "npm start --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm --prefix frontend run build",
+    "postinstall": "npm --prefix backend install && npm --prefix frontend install",
     "install-client": "cd frontend && npm install",
     "install-server": "cd backend && npm install",
     "install-all": "npm install && npm run install-client && npm run install-server"

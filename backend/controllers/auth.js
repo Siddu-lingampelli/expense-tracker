@@ -40,7 +40,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   // Check for user
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findByEmailWithPassword(email);
 
   if (!user) {
     return next(new ErrorResponse('Invalid credentials', 401));
@@ -91,15 +91,22 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/auth/updatepassword
 // @access  Private
 exports.updatePassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id).select('+password');
+  const bcrypt = require('bcryptjs');
+  const db = require('../storage/db');
+  const rawUser = db.findOne('users', { _id: req.user.id });
 
-  // Check current password
-  if (!(await user.matchPassword(req.body.currentPassword))) {
+  if (!rawUser) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  const isMatch = await bcrypt.compare(req.body.currentPassword, rawUser.password);
+  if (!isMatch) {
     return next(new ErrorResponse('Password is incorrect', 401));
   }
 
-  user.password = req.body.newPassword;
-  await user.save();
+  const user = await User.findByIdAndUpdate(req.user.id, {
+    password: req.body.newPassword
+  });
 
   sendTokenResponse(user, 200, res);
 });

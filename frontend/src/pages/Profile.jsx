@@ -25,7 +25,7 @@ const Profile = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await api.put('/auth/updatedetails', data);
+      const response = await api.put('/user/profile', data);
       return response.data;
     },
     onSuccess: () => {

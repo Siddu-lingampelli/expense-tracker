@@ -1,6 +1,5 @@
 const dotenv = require('dotenv');
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -10,7 +9,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Set default environment variables if not provided
 if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = 'your-super-secret-jwt-key-here-make-it-long-and-random-12345';
+  process.env.JWT_SECRET = 'dev-temp-jwt-key-change-in-production';
 }
 if (!process.env.JWT_EXPIRE) {
   process.env.JWT_EXPIRE = '30d';
@@ -19,12 +18,7 @@ if (!process.env.JWT_COOKIE_EXPIRE) {
   process.env.JWT_COOKIE_EXPIRE = '30';
 }
 
-// Debug log to verify environment variables
-console.log('Environment variables:', {
-  NODE_ENV: process.env.NODE_ENV,
-  MONGO_URI: process.env.MONGO_URI ? '***' : 'undefined',
-  PORT: process.env.PORT
-});
+console.log('Server starting in ' + (process.env.NODE_ENV || 'development') + ' mode on port ' + (process.env.PORT || 5000));
 
 const app = express();
 
@@ -48,38 +42,25 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Database connection
-const connectDB = async () => {
-  try {
-    const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/expense-tracker';
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('MongoDB connected successfully');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1); // Exit process with failure
-  }
-};
-
-// Connect to MongoDB
-connectDB();
+// Initialize database (creates data file if not exists)
+require('./storage/db');
+console.log('Storage initialized (JSON file-based)');
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/user', require('./routes/user'));
+app.use('/api/categories', require('./routes/categories'));
 
 // Error handler middleware
 app.use(require('./middleware/error'));
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
   
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
   });
 }
 

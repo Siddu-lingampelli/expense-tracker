@@ -84,7 +84,7 @@ const Transactions = () => {
         </div>
         <Link
           to="/dashboard/transactions/new"
-          className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150"
+          className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150"
         >
           <FiPlus className="h-3 w-3" /> Add
         </Link>
@@ -98,24 +98,24 @@ const Transactions = () => {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="block w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1"
+              className="block w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               placeholder="Search transactions..."
             />
           </form>
           <div className="flex flex-wrap items-center gap-2">
-            <select value={type} onChange={(e) => setParam('type', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <select value={type} onChange={(e) => setParam('type', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
               <option value="all">All types</option>
               <option value="income">Income</option>
               <option value="expense">Expense</option>
             </select>
-            <select value={category} onChange={(e) => setParam('category', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <select value={category} onChange={(e) => setParam('category', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
               <option value="all">All categories</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <select value={dateRange} onChange={(e) => setParam('dateRange', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <select value={dateRange} onChange={(e) => setParam('dateRange', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
               {DATE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select>
-            <select value={sortBy} onChange={(e) => setParam('sortBy', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <select value={sortBy} onChange={(e) => setParam('sortBy', e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
               {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             {filtersActive && (
@@ -138,7 +138,7 @@ const Transactions = () => {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" />
+            <div className="w-5 h-5 border border-primary/30 border-t-primary rounded-full animate-spin" />
           </div>
         ) : error ? (
           <div className="px-4 py-12 text-center text-xs text-destructive">Failed to load transactions.</div>
@@ -151,7 +151,7 @@ const Transactions = () => {
                     type="checkbox"
                     checked={selected.includes(t._id)}
                     onChange={() => toggleSelect(t._id)}
-                    className="h-3.5 w-3.5 rounded border-border text-foreground focus:ring-foreground flex-shrink-0"
+                    className="h-3.5 w-3.5 rounded border-border text-foreground focus:ring-primary flex-shrink-0"
                   />
                   <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${t.type === 'income' ? 'bg-success' : 'bg-destructive'}`} />
                   <div className="min-w-0">
@@ -203,7 +203,7 @@ const Transactions = () => {
                   <button
                     key={n}
                     onClick={() => setParam('page', String(n))}
-                    className={`w-7 h-7 text-xs rounded transition-colors ${page === n ? 'bg-foreground text-background' : 'text-secondary-foreground hover:text-foreground hover:bg-secondary'}`}
+                    className={`w-7 h-7 text-xs rounded transition-colors ${page === n ? 'bg-primary text-primary-foreground' : 'text-secondary-foreground hover:text-foreground hover:bg-secondary'}`}
                   >
                     {n}
                   </button>

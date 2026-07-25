@@ -50,7 +50,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" />
+        <div className="w-5 h-5 border border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -72,7 +72,7 @@ const Dashboard = () => {
               key={r.value}
               onClick={() => setTimeRange(r.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-all duration-150 ${
-                timeRange === r.value ? 'bg-foreground text-background' : 'text-secondary-foreground hover:text-foreground'
+                timeRange === r.value ? 'bg-primary text-primary-foreground' : 'text-secondary-foreground hover:text-foreground'
               }`}
             >
               {r.label}
@@ -89,7 +89,7 @@ const Dashboard = () => {
           { label: 'Transactions', value: String(data?.transactionCount || 0), color: '' },
         ].map((stat, i) => (
           <AnimatedCard key={stat.label} delay={`stagger-${i + 1}`}>
-            <div className="border border-border rounded-md p-4 group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
+            <div className="border border-border rounded-md p-4 group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
               <p className="text-xs text-secondary-foreground">{stat.label}</p>
               <p className={`text-lg font-medium mt-1 tabular-nums ${stat.color}`}>{stat.value}</p>
             </div>
@@ -99,7 +99,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnimatedCard delay="stagger-3">
-          <div className="border border-border rounded-md p-4 group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
+          <div className="border border-border rounded-md p-4 group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
             <h3 className="text-xs font-medium text-foreground mb-4">Income vs Expenses</h3>
             <div className="h-64">
               {barData && <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#EBEBEB' }, ticks: { callback: (v) => '$' + v } } } }} />}
@@ -107,7 +107,7 @@ const Dashboard = () => {
           </div>
         </AnimatedCard>
         <AnimatedCard delay="stagger-4">
-          <div className="border border-border rounded-md p-4 group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
+          <div className="border border-border rounded-md p-4 group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
             <h3 className="text-xs font-medium text-foreground mb-4">Expense Categories</h3>
             <div className="h-64 flex items-center justify-center">
               {doughnutData && doughnutData.labels.length > 0 ? (
@@ -121,7 +121,7 @@ const Dashboard = () => {
       </div>
 
       <AnimatedCard delay="stagger-5">
-        <div className="border border-border rounded-md overflow-hidden group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
+        <div className="border border-border rounded-md overflow-hidden group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
               <h3 className="text-xs font-medium text-foreground">Recent Transactions</h3>
@@ -129,7 +129,7 @@ const Dashboard = () => {
             </div>
             <Link
               to="/dashboard/transactions/new"
-              className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150"
+              className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150"
             >
               <FiPlus className="h-3 w-3" /> Add
             </Link>

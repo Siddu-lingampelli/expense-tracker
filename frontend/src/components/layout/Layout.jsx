@@ -81,7 +81,7 @@ const Layout = () => {
 
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-2 border-r border-border pr-2">
-                <div className="w-7 h-7 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-medium">
+                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <span className="text-sm text-foreground">{user?.name || 'User'}</span>

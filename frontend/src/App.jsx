@@ -16,14 +16,14 @@ import NotFound from './pages/NotFound';
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-5 h-5 border border-primary/30 border-t-primary rounded-full animate-spin" /></div>;
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
   return <div className="animate-fade-in">{children}</div>;
 };
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-5 h-5 border border-primary/30 border-t-primary rounded-full animate-spin" /></div>;
   if (user) return <Navigate to="/dashboard" replace />;
   return <div className="animate-fade-in">{children}</div>;
 };

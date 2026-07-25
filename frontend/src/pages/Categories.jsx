@@ -59,7 +59,7 @@ const Categories = () => {
 
   const display = categories?.length > 0 ? categories : defaultCategories;
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="w-5 h-5 border border-primary/30 border-t-primary rounded-full animate-spin" /></div>;
 
   return (
     <div className="space-y-6">
@@ -68,14 +68,14 @@ const Categories = () => {
           <h1 className="text-base font-medium text-foreground">Categories</h1>
           <p className="text-xs text-secondary-foreground mt-0.5">Manage your transaction categories</p>
         </div>
-        <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150">
+        <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150">
           <FiPlus className="h-3 w-3" /> Add
         </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {display.map((cat, i) => (
-          <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
+          <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between group hover:border-primary/20 hover:shadow-sm transition-all duration-200">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
               <div className="min-w-0">
@@ -100,11 +100,11 @@ const Categories = () => {
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="space-y-1">
                 <label className="text-xs font-medium text-foreground">Name</label>
-                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required />
+                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1" required />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-foreground">Type</label>
-                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
+                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1">
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>
@@ -115,7 +115,7 @@ const Categories = () => {
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={handleClose} className="flex-1 px-4 py-2 text-xs font-medium text-secondary-foreground hover:text-foreground transition-colors border border-border rounded-md">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity">
+                <button type="submit" className="flex-1 px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity">
                   {editing ? 'Update' : 'Create'}
                 </button>
               </div>

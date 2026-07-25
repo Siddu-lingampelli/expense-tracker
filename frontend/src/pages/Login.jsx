@@ -59,7 +59,7 @@ const Login = () => {
               id="email"
               type="email"
               autoComplete="email"
-              className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1"
+              className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               placeholder="you@example.com"
               {...register('email')}
             />
@@ -72,7 +72,7 @@ const Login = () => {
               id="password"
               type="password"
               autoComplete="current-password"
-              className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1"
+              className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               placeholder="password"
               {...register('password')}
             />
@@ -82,7 +82,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-md bg-foreground text-background text-sm font-medium py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150 disabled:opacity-50"
+            className="w-full rounded-md bg-primary text-primary-foreground text-sm font-medium py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150 disabled:opacity-50"
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>

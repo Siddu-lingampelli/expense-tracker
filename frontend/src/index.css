@@ -81,11 +81,11 @@ input[type="number"] {
 }
 
 input:focus-visible {
-  @apply outline-none ring-2 ring-foreground ring-offset-1;
+  @apply outline-none ring-2 ring-primary ring-offset-1;
 }
 
 select:focus-visible {
-  @apply outline-none ring-2 ring-foreground ring-offset-1;
+  @apply outline-none ring-2 ring-primary ring-offset-1;
 }
 
 .Toastify__toast {

@@ -12,26 +12,26 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: '#EBEBEB',
-        input: '#EBEBEB',
-        ring: '#0A0A0A',
-        background: '#FFFFFF',
-        foreground: '#0A0A0A',
+        border: '#E6E2D8',
+        input: '#E6E2D8',
+        ring: '#1A1A2E',
+        background: '#F5F3EF',
+        foreground: '#1A1A1A',
         primary: {
-          DEFAULT: '#0A0A0A',
+          DEFAULT: '#1A1A2E',
           foreground: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: '#F5F5F5',
-          foreground: '#0A0A0A',
+          DEFAULT: '#EDEAE2',
+          foreground: '#8B8580',
         },
         muted: {
-          DEFAULT: '#F9F9F9',
-          foreground: '#9E9E9E',
+          DEFAULT: '#E6E2D8',
+          foreground: '#A8A29E',
         },
         accent: {
-          DEFAULT: '#F5F5F5',
-          foreground: '#0A0A0A',
+          DEFAULT: '#FFFFFF',
+          foreground: '#1A1A1A',
         },
         destructive: {
           DEFAULT: '#DC2626',
@@ -43,7 +43,7 @@ module.exports = {
         },
         card: {
           DEFAULT: '#FFFFFF',
-          foreground: '#0A0A0A',
+          foreground: '#1A1A1A',
         },
       },
       borderRadius: {

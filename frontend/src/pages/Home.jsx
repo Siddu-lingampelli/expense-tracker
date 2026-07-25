@@ -44,7 +44,7 @@ const Home = () => {
           <span className="text-sm font-semibold tracking-tight">$ monitor</span>
           <div className="flex items-center gap-3">
             <Link to="/login" className="text-sm text-secondary-foreground hover:text-foreground transition-colors">Sign in</Link>
-            <Link to="/register" className="inline-flex items-center gap-1 bg-foreground text-background text-sm font-medium rounded-md px-4 py-1.5 hover:opacity-90 transition-opacity">
+            <Link to="/register" className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-sm font-medium rounded-md px-4 py-1.5 hover:opacity-90 transition-opacity">
               Get started <FiArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -61,7 +61,7 @@ const Home = () => {
             Track your expenses without handing your data to anyone.
           </p>
           <div className="flex items-center justify-center gap-3">
-            <Link to="/register" className="group inline-flex items-center gap-1.5 bg-foreground text-background text-sm font-medium rounded-md px-6 py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150">
+            <Link to="/register" className="group inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-sm font-medium rounded-md px-6 py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               Start tracking <FiArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link to="/login" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground border border-border rounded-md px-6 py-2.5 hover:bg-secondary active:scale-[0.98] transition-all duration-150">
@@ -82,7 +82,7 @@ const Home = () => {
             {features.map((f, i) => (
               <StaggerChild key={f.title} index={i}>
                 <div className="bg-background p-6 md:p-8 group hover:bg-secondary/30 transition-colors duration-300">
-                  <div className="w-9 h-9 rounded-md border border-border flex items-center justify-center mb-4 group-hover:border-foreground/30 transition-colors duration-300">
+                  <div className="w-9 h-9 rounded-md border border-border flex items-center justify-center mb-4 group-hover:border-primary/30 transition-colors duration-300">
                     <f.icon className="h-4 w-4 text-foreground" />
                   </div>
                   <h3 className="text-sm font-medium text-foreground mb-1.5">{f.title}</h3>
@@ -104,7 +104,7 @@ const Home = () => {
             {steps.map((s, i) => (
               <StaggerChild key={s.num} index={i}>
                 <div className="text-center group">
-                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center mx-auto mb-4 group-hover:border-foreground/40 transition-colors duration-300">
+                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center mx-auto mb-4 group-hover:border-primary/40 transition-colors duration-300">
                     <span className="text-xs font-mono text-secondary-foreground">{s.num}</span>
                   </div>
                   <h3 className="text-sm font-medium text-foreground mb-1.5">{s.title}</h3>
@@ -121,7 +121,7 @@ const Home = () => {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-2xl md:text-3xl font-light tracking-tight mb-4">Ready to take control?</h2>
             <p className="text-sm text-secondary-foreground mb-8 max-w-sm mx-auto">No sign-up fees. No servers. No fine print. Just a simple page that respects your privacy.</p>
-            <Link to="/register" className="group inline-flex items-center gap-1.5 bg-foreground text-background text-sm font-medium rounded-md px-6 py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150">
+            <Link to="/register" className="group inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-sm font-medium rounded-md px-6 py-2.5 hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               Get started for free <FiArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>

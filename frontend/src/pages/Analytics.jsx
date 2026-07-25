@@ -60,12 +60,12 @@ const Analytics = () => {
           <p className="text-xs text-secondary-foreground mt-0.5">Insights into your spending</p>
         </div>
         <div className="flex items-center gap-2">
-          <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+          <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
             <option value="week">Last 7 days</option>
             <option value="month">This month</option>
             <option value="year">This year</option>
           </select>
-          <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+          <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
             <option value="category">By category</option>
             <option value="monthly">Monthly trend</option>
           </select>

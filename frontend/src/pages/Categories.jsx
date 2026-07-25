@@ -1,264 +1,128 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
-const Categories = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    type: 'expense',
-    color: '#3B82F6',
-    icon: '💰'
-  });
+const defaultCategories = [
+  { name: 'Food & Dining', type: 'expense', color: '#EF4444', icon: '🍽️' },
+  { name: 'Transportation', type: 'expense', color: '#F59E0B', icon: '🚗' },
+  { name: 'Shopping', type: 'expense', color: '#8B5CF6', icon: '🛍️' },
+  { name: 'Entertainment', type: 'expense', color: '#EC4899', icon: '🎬' },
+  { name: 'Bills & Utilities', type: 'expense', color: '#6B7280', icon: '💡' },
+  { name: 'Healthcare', type: 'expense', color: '#10B981', icon: '🏥' },
+  { name: 'Salary', type: 'income', color: '#059669', icon: '💼' },
+  { name: 'Freelance', type: 'income', color: '#0891B2', icon: '💻' },
+  { name: 'Investment', type: 'income', color: '#7C3AED', icon: '📈' },
+];
 
+const Categories = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ name: '', type: 'expense', color: '#3B82F6', icon: '💰' });
   const queryClient = useQueryClient();
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ['categories'],
-    queryFn: async () => {
-      const response = await api.get('/categories');
-      return response.data.data;
-    },
+    queryFn: async () => { const r = await api.get('/categories'); return r.data.data; },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (categoryData) => {
-      const response = await api.post('/categories', categoryData);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['categories']);
-      toast.success('Category created successfully');
-      handleCloseModal();
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to create category');
-    },
+    mutationFn: async (d) => { const r = await api.post('/categories', d); return r.data; },
+    onSuccess: () => { queryClient.invalidateQueries(['categories']); toast.success('Category created'); handleClose(); },
+    onError: (e) => toast.error(e.response?.data?.message || 'Failed'),
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, ...categoryData }) => {
-      const response = await api.put(`/categories/${id}`, categoryData);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['categories']);
-      toast.success('Category updated successfully');
-      handleCloseModal();
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update category');
-    },
+    mutationFn: async ({ id, ...d }) => { const r = await api.put(`/categories/${id}`, d); return r.data; },
+    onSuccess: () => { queryClient.invalidateQueries(['categories']); toast.success('Category updated'); handleClose(); },
+    onError: (e) => toast.error(e.response?.data?.message || 'Failed'),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await api.delete(`/categories/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['categories']);
-      toast.success('Category deleted successfully');
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to delete category');
-    },
+    mutationFn: async (id) => { await api.delete(`/categories/${id}`); },
+    onSuccess: () => { queryClient.invalidateQueries(['categories']); toast.success('Category deleted'); },
+    onError: (e) => toast.error(e.response?.data?.message || 'Failed'),
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editingCategory) {
-      updateMutation.mutate({ id: editingCategory._id, ...formData });
-    } else {
-      createMutation.mutate(formData);
-    }
+    if (editing) updateMutation.mutate({ id: editing._id, ...form });
+    else createMutation.mutate(form);
   };
 
-  const handleEdit = (category) => {
-    setEditingCategory(category);
-    setFormData({
-      name: category.name,
-      type: category.type,
-      color: category.color,
-      icon: category.icon
-    });
-    setIsModalOpen(true);
-  };
+  const handleEdit = (cat) => { setEditing(cat); setForm({ name: cat.name, type: cat.type, color: cat.color, icon: cat.icon }); setModalOpen(true); };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteMutation.mutate(id);
-    }
-  };
+  const handleDelete = (id) => { if (window.confirm('Delete this category?')) deleteMutation.mutate(id); };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingCategory(null);
-    setFormData({
-      name: '',
-      type: 'expense',
-      color: '#3B82F6',
-      icon: '💰'
-    });
-  };
+  const handleClose = () => { setModalOpen(false); setEditing(null); setForm({ name: '', type: 'expense', color: '#3B82F6', icon: '💰' }); };
 
-  const defaultCategories = [
-    { name: 'Food & Dining', type: 'expense', color: '#EF4444', icon: '🍽️' },
-    { name: 'Transportation', type: 'expense', color: '#F59E0B', icon: '🚗' },
-    { name: 'Shopping', type: 'expense', color: '#8B5CF6', icon: '🛍️' },
-    { name: 'Entertainment', type: 'expense', color: '#EC4899', icon: '🎬' },
-    { name: 'Bills & Utilities', type: 'expense', color: '#6B7280', icon: '💡' },
-    { name: 'Healthcare', type: 'expense', color: '#10B981', icon: '🏥' },
-    { name: 'Salary', type: 'income', color: '#059669', icon: '💼' },
-    { name: 'Freelance', type: 'income', color: '#0891B2', icon: '💻' },
-    { name: 'Investment', type: 'income', color: '#7C3AED', icon: '📈' },
-  ];
+  const display = categories?.length > 0 ? categories : defaultCategories;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  const displayCategories = categories?.length > 0 ? categories : defaultCategories;
+  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="w-5 h-5 border border-foreground/30 border-t-foreground rounded-full animate-spin" /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark flex items-center gap-2"
-        >
-          <PlusIcon className="h-5 w-5" />
-          Add Category
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-base font-medium text-foreground">Categories</h1>
+          <p className="text-xs text-secondary-foreground mt-0.5">Manage your transaction categories</p>
+        </div>
+        <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 transition-opacity">
+          <FiPlus className="h-3 w-3" /> Add
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {displayCategories.map((category, index) => (
-          <div
-            key={category._id || index}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4"
-            style={{ borderLeftColor: category.color }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{category.icon}</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                    {category.type}
-                  </p>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {display.map((cat, i) => (
+          <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-lg flex-shrink-0">{cat.icon}</span>
+              <div className="min-w-0">
+                <p className="text-sm text-foreground truncate">{cat.name}</p>
+                <p className="text-2xs text-secondary-foreground capitalize">{cat.type}</p>
               </div>
-              
-              {category._id && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(category)}
-                    className="text-blue-600 hover:text-blue-800 p-1"
-                  >
-                    <PencilIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(category._id)}
-                    className="text-red-600 hover:text-red-800 p-1"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
             </div>
+            {cat._id && (
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                <button onClick={() => handleEdit(cat)} className="p-1 text-muted-foreground hover:text-foreground transition-colors"><FiEdit2 className="h-3 w-3" /></button>
+                <button onClick={() => handleDelete(cat._id)} className="p-1 text-muted-foreground hover:text-destructive transition-colors"><FiTrash2 className="h-3 w-3" /></button>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
-            </h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20">
+          <div className="bg-white rounded-md border border-border w-full max-w-sm p-4">
+            <h2 className="text-sm font-medium text-foreground mb-4">{editing ? 'Edit Category' : 'Add Category'}</h2>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">Name</label>
+                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Type
-                </label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">Type</label>
+                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Color
-                </label>
-                <input
-                  type="color"
-                  value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Color</label>
+                  <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="block w-full h-9 rounded-md border border-input bg-background p-0.5 cursor-pointer" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Icon</label>
+                  <input type="text" value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" placeholder="💰" />
+                </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Icon (Emoji)
-                </label>
-                <input
-                  type="text"
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="💰"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createMutation.isLoading || updateMutation.isLoading}
-                  className="flex-1 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark disabled:opacity-50"
-                >
-                  {createMutation.isLoading || updateMutation.isLoading
-                    ? 'Saving...'
-                    : editingCategory
-                    ? 'Update'
-                    : 'Create'}
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={handleClose} className="flex-1 px-4 py-2 text-xs font-medium text-secondary-foreground hover:text-foreground transition-colors border border-border rounded-md">Cancel</button>
+                <button type="submit" className="flex-1 px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity">
+                  {editing ? 'Update' : 'Create'}
                 </button>
               </div>
             </form>

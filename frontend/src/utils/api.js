@@ -371,11 +371,9 @@ function route(method, url, sendData, config) {
     if (err.response) {
       const { status, data } = err.response;
       let message = data?.error || 'An error occurred';
-      if (status === 401 && window.location.pathname !== '/login') {
-        toast.error(message);
-        setTimeout(() => { window.location.href = '/login'; }, 500);
-      } else if (status >= 400) {
-        toast.error(message);
+      if (status >= 400) {
+        const skip = status === 401 && path === '/auth/me';
+        if (!skip) toast.error(message);
       }
     }
     return Promise.reject(err);

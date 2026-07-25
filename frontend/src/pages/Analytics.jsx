@@ -1,28 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import api from '../utils/api';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState('month');
@@ -31,239 +14,91 @@ const Analytics = () => {
   const getDateRange = () => {
     const now = new Date();
     switch (dateRange) {
-      case 'week':
-        return {
-          startDate: format(subDays(now, 7), 'yyyy-MM-dd'),
-          endDate: format(now, 'yyyy-MM-dd'),
-        };
-      case 'month':
-        return {
-          startDate: format(startOfMonth(now), 'yyyy-MM-dd'),
-          endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
-        };
-      case 'year':
-        return {
-          startDate: format(new Date(now.getFullYear(), 0, 1), 'yyyy-MM-dd'),
-          endDate: format(now, 'yyyy-MM-dd'),
-        };
-      default:
-        return {
-          startDate: format(startOfMonth(now), 'yyyy-MM-dd'),
-          endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
-        };
+      case 'week': return { startDate: format(subDays(now, 7), 'yyyy-MM-dd'), endDate: format(now, 'yyyy-MM-dd') };
+      case 'month': return { startDate: format(startOfMonth(now), 'yyyy-MM-dd'), endDate: format(endOfMonth(now), 'yyyy-MM-dd') };
+      case 'year': return { startDate: format(new Date(now.getFullYear(), 0, 1), 'yyyy-MM-dd'), endDate: format(now, 'yyyy-MM-dd') };
+      default: return { startDate: format(startOfMonth(now), 'yyyy-MM-dd'), endDate: format(endOfMonth(now), 'yyyy-MM-dd') };
     }
   };
 
-  const { data: analyticsData, isLoading } = useQuery({
+  const { data: summary } = useQuery({
     queryKey: ['analytics', dateRange],
-    queryFn: async () => {
-      // Use the existing summary endpoint with range parameter
-      const response = await api.get(`/transactions/summary?range=${dateRange}`);
-      return response.data.data;
-    },
+    queryFn: async () => { const r = await api.get(`/transactions/summary?range=${dateRange}`); return r.data.data; },
   });
 
   const { data: transactions } = useQuery({
-    queryKey: ['transactions-analytics', dateRange],
-    queryFn: async () => {
-      const { startDate, endDate } = getDateRange();
-      // Use the filter endpoint with proper date format
-      const response = await api.get(`/transactions/filter?startDate=${startDate}&endDate=${endDate}`);
-      return response.data.data;
-    },
+    queryKey: ['analytics-tx', dateRange],
+    queryFn: async () => { const { startDate, endDate } = getDateRange(); const r = await api.get(`/transactions/filter?startDate=${startDate}&endDate=${endDate}`); return r.data.data; },
   });
 
+  const fmt = (v) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(v);
+
   const getCategoryData = () => {
-    if (!transactions) return { labels: [], datasets: [] };
-
-    const categoryTotals = {};
-    transactions
-      .filter(t => t.type === 'expense')
-      .forEach(transaction => {
-        categoryTotals[transaction.category] = (categoryTotals[transaction.category] || 0) + transaction.amount;
-      });
-
-    return {
-      labels: Object.keys(categoryTotals),
-      datasets: [
-        {
-          data: Object.values(categoryTotals),
-          backgroundColor: [
-            '#FF6384',
-            '#36A2EB',
-            '#FFCE56',
-            '#4BC0C0',
-            '#9966FF',
-            '#FF9F40',
-            '#FF6384',
-            '#C9CBCF',
-          ],
-          borderWidth: 2,
-        },
-      ],
-    };
+    if (!transactions) return null;
+    const cats = {};
+    transactions.filter(t => t.type === 'expense').forEach(t => { cats[t.category] = (cats[t.category] || 0) + t.amount; });
+    const labels = Object.keys(cats);
+    return labels.length ? { labels, datasets: [{ data: Object.values(cats), backgroundColor: ['#16A34A', '#2563EB', '#D97706', '#7C3AED', '#0891B2', '#DB2777', '#65A30D', '#0D9488'], borderWidth: 0 }] } : null;
   };
 
   const getMonthlyData = () => {
-    if (!transactions) return { labels: [], datasets: [] };
-
-    const monthlyData = {};
-    transactions.forEach(transaction => {
-      const month = format(new Date(transaction.date), 'MMM yyyy');
-      if (!monthlyData[month]) {
-        monthlyData[month] = { income: 0, expense: 0 };
-      }
-      monthlyData[month][transaction.type] += transaction.amount;
-    });
-
-    const labels = Object.keys(monthlyData).sort();
-    
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Income',
-          data: labels.map(month => monthlyData[month].income),
-          backgroundColor: '#10B981',
-          borderColor: '#059669',
-          borderWidth: 1,
-        },
-        {
-          label: 'Expenses',
-          data: labels.map(month => monthlyData[month].expense),
-          backgroundColor: '#EF4444',
-          borderColor: '#DC2626',
-          borderWidth: 1,
-        },
-      ],
-    };
+    if (!transactions) return null;
+    const md = {};
+    transactions.forEach(t => { const m = format(new Date(t.date), 'MMM yyyy'); if (!md[m]) md[m] = { income: 0, expense: 0 }; md[m][t.type] += t.amount; });
+    const labels = Object.keys(md).sort();
+    return labels.length ? { labels, datasets: [
+      { label: 'Income', data: labels.map(m => md[m].income), backgroundColor: '#16A34A', borderRadius: 2 },
+      { label: 'Expenses', data: labels.map(m => md[m].expense), backgroundColor: '#DC2626', borderRadius: 2 },
+    ] } : null;
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
-        
-        <div className="flex flex-wrap gap-2">
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="week">Last 7 Days</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-base font-medium text-foreground">Analytics</h1>
+          <p className="text-xs text-secondary-foreground mt-0.5">Insights into your spending</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <option value="week">Last 7 days</option>
+            <option value="month">This month</option>
+            <option value="year">This year</option>
           </select>
-          
-          <select
-            value={chartType}
-            onChange={(e) => setChartType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="category">By Category</option>
-            <option value="monthly">Monthly Trend</option>
+          <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="text-xs rounded-md border border-input bg-background px-2 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+            <option value="category">By category</option>
+            <option value="monthly">Monthly trend</option>
           </select>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      {analyticsData && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Total Balance
-            </h3>
-            <p className={`text-2xl font-bold mt-2 ${
-              (analyticsData.balance || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              ${(analyticsData.balance || 0).toFixed(2)}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Total Income
-            </h3>
-            <p className="text-2xl font-bold text-green-600 mt-2">
-              ${(analyticsData.totalIncome || 0).toFixed(2)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Income transactions
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Total Expenses
-            </h3>
-            <p className="text-2xl font-bold text-red-600 mt-2">
-              ${(analyticsData.totalExpenses || 0).toFixed(2)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Expense transactions
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Transaction Count
-            </h3>
-            <p className="text-2xl font-bold text-blue-600 mt-2">
-              {analyticsData.transactionCount || 0}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Total transactions
-            </p>
-          </div>
+      {summary && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: 'Balance', value: fmt(summary.balance || 0), color: (summary.balance || 0) >= 0 ? 'text-success' : 'text-destructive' },
+            { label: 'Income', value: fmt(summary.totalIncome || 0), color: 'text-success' },
+            { label: 'Expenses', value: fmt(Math.abs(summary.totalExpenses) || 0), color: 'text-destructive' },
+            { label: 'Transactions', value: String(summary.transactionCount || 0), color: '' },
+          ].map(s => (
+            <div key={s.label} className="border border-border rounded-md p-4">
+              <p className="text-xs text-secondary-foreground">{s.label}</p>
+              <p className={`text-lg font-medium mt-1 tabular-nums ${s.color}`}>{s.value}</p>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Charts */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="border border-border rounded-md p-4">
+        <h2 className="text-xs font-medium text-foreground mb-4">
           {chartType === 'category' ? 'Expenses by Category' : 'Monthly Income vs Expenses'}
         </h2>
-        
-        <div className="h-96">
+        <div className="h-80">
           {chartType === 'category' ? (
-            <Doughnut
-              data={getCategoryData()}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: 'right',
-                  },
-                },
-              }}
-            />
+            getCategoryData() ? <Doughnut data={getCategoryData()} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 8, padding: 12, font: { size: 11 } } } } }} />
+              : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">No data</div>
           ) : (
-            <Bar
-              data={getMonthlyData()}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: 'top',
-                  },
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
-                },
-              }}
-            />
+            getMonthlyData() ? <Bar data={getMonthlyData()} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { boxWidth: 8, font: { size: 11 } } } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#EBEBEB' }, beginAtZero: true, ticks: { callback: (v) => '$' + v } } } }} />
+              : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">No data</div>
           )}
         </div>
       </div>

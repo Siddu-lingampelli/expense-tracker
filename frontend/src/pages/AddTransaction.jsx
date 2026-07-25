@@ -18,275 +18,110 @@ const INCOME_CATEGORIES = [
 const AddTransaction = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState({
-    description: '',
-    amount: '',
-    type: 'expense',
-    category: '',
-    date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-    account: 'Cash'
+  const [form, setForm] = useState({
+    description: '', amount: '', type: 'expense', category: '',
+    date: new Date().toISOString().split('T')[0], account: 'Cash',
   });
   const [errors, setErrors] = useState({});
 
-  // Mutation for creating transaction
-  const createTransactionMutation = useMutation({
-    mutationFn: async (transactionData) => {
-      const { data } = await api.post('/transactions', transactionData);
-      return data;
-    },
+  const mutation = useMutation({
+    mutationFn: async (data) => { const r = await api.post('/transactions', data); return r.data; },
     onSuccess: () => {
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['dashboard']);
-      toast.success('Transaction added successfully');
+      toast.success('Transaction added');
       navigate('/dashboard/transactions');
     },
-    onError: (error) => {
-      console.error('Error creating transaction:', error);
-      const errorMessage = error.response?.data?.error || 'Failed to create transaction';
-      toast.error(errorMessage);
-    }
+    onError: (err) => toast.error(err.response?.data?.error || 'Failed to create'),
   });
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-
-    if (!formData.amount || isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = 'Please enter a valid amount greater than 0';
-    }
-
-    if (!formData.category) {
-      newErrors.category = 'Please select a category';
-    }
-
-    if (!formData.date) {
-      newErrors.date = 'Please select a date';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validate = () => {
+    const e = {};
+    if (!form.description.trim()) e.description = 'Required';
+    if (!form.amount || isNaN(form.amount) || parseFloat(form.amount) <= 0) e.amount = 'Enter a valid amount';
+    if (!form.category) e.category = 'Select a category';
+    if (!form.date) e.date = 'Select a date';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    // Prepare data for submission
-    const transactionData = {
-      ...formData,
-      amount: parseFloat(formData.amount),
-      date: new Date(formData.date).toISOString()
-    };
-
-    createTransactionMutation.mutate(transactionData);
+    if (!validate()) return;
+    mutation.mutate({ ...form, amount: parseFloat(form.amount), date: new Date(form.date).toISOString() });
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Header */}
+    <div className="max-w-lg mx-auto">
       <div className="mb-6">
-        <button
-          onClick={() => navigate('/dashboard/transactions')}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600 mb-4"
-        >
-          <FiArrowLeft className="-ml-1 mr-2 h-5 w-5" />
-          Back to Transactions
+        <button onClick={() => navigate('/dashboard/transactions')} className="inline-flex items-center gap-1.5 text-xs text-secondary-foreground hover:text-foreground transition-colors mb-4">
+          <FiArrowLeft className="h-3 w-3" /> back
         </button>
-
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add New Transaction</h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Enter the details of your new transaction
-        </p>
+        <h1 className="text-base font-medium text-foreground">Add Transaction</h1>
+        <p className="text-xs text-secondary-foreground mt-0.5">Enter the details of your transaction.</p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 dark:bg-gray-800">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {/* Transaction Type */}
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Transaction Type
-            </label>
-            <div className="flex space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="type"
-                  value="expense"
-                  checked={formData.type === 'expense'}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Expense</span>
+      <form onSubmit={handleSubmit} className="border border-border rounded-md p-4 space-y-4">
+        <div>
+          <label className="text-xs font-medium text-foreground">Type</label>
+          <div className="flex gap-3 mt-1">
+            {['expense', 'income'].map((t) => (
+              <label key={t} className="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="type" value={t} checked={form.type === t} onChange={handleChange} className="h-3.5 w-3.5 text-foreground focus:ring-foreground border-border" />
+                <span className="text-sm text-foreground capitalize">{t}</span>
               </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="type"
-                  value="income"
-                  checked={formData.type === 'income'}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Income</span>
-              </label>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Description */}
-          <div className="sm:col-span-2">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Description *
-            </label>
-            <input
-              type="text"
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className={`mt-1 block w-full border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-              placeholder="Enter transaction description"
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
+        <div className="space-y-1">
+          <label htmlFor="description" className="text-xs font-medium text-foreground">Description</label>
+          <input id="description" name="description" type="text" value={form.description} onChange={handleChange} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" placeholder="What was it for?" />
+          {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="amount" className="text-xs font-medium text-foreground">Amount</label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-secondary-foreground pointer-events-none">$</span>
+            <input id="amount" name="amount" type="number" min="0" step="0.01" value={form.amount} onChange={handleChange} className="block w-full rounded-md border border-input bg-background pl-7 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" placeholder="0.00" />
           </div>
+          {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
+        </div>
 
-          {/* Amount */}
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Amount *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">$</span>
-              </div>
-              <input
-                type="number"
-                id="amount"
-                name="amount"
-                value={formData.amount}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                className={`mt-1 block w-full pl-8 border ${errors.amount ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-                placeholder="0.00"
-              />
-            </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
-            )}
+        <div className="space-y-1">
+          <label htmlFor="category" className="text-xs font-medium text-foreground">Category</label>
+          <select id="category" name="category" value={form.category} onChange={handleChange} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
+            <option value="">Select...</option>
+            {(form.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          {errors.category && <p className="text-xs text-destructive">{errors.category}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label htmlFor="date" className="text-xs font-medium text-foreground">Date</label>
+            <input id="date" name="date" type="date" value={form.date} onChange={handleChange} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" />
+            {errors.date && <p className="text-xs text-destructive">{errors.date}</p>}
           </div>
-
-          {/* Category */}
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Category *
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              className={`mt-1 block w-full border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-            >
-              <option value="">Select a category</option>
-              {(formData.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-            )}
-          </div>
-
-          {/* Date */}
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Date *
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              className={`mt-1 block w-full border ${errors.date ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-            />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date}</p>
-            )}
-          </div>
-
-          {/* Account */}
-          <div>
-            <label htmlFor="account" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Account
-            </label>
-            <select
-              id="account"
-              name="account"
-              value={formData.account}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            >
-              <option value="Cash">Cash</option>
-              <option value="Bank Account">Bank Account</option>
-              <option value="Credit Card">Credit Card</option>
-              <option value="Digital Wallet">Digital Wallet</option>
+          <div className="space-y-1">
+            <label htmlFor="account" className="text-xs font-medium text-foreground">Account</label>
+            <select id="account" name="account" value={form.account} onChange={handleChange} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
+              {['Cash', 'Bank Account', 'Credit Card', 'Digital Wallet'].map(a => <option key={a} value={a}>{a}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="mt-6 flex justify-end">
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard/transactions')}
-            className="mr-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={createTransactionMutation.isLoading}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {createTransactionMutation.isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                Saving...
-              </>
-            ) : (
-              <>
-                <FiSave className="-ml-1 mr-2 h-5 w-5" />
-                Save Transaction
-              </>
-            )}
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" onClick={() => navigate('/dashboard/transactions')} className="px-4 py-2 text-xs font-medium text-secondary-foreground hover:text-foreground transition-colors border border-border rounded-md">Cancel</button>
+          <button type="submit" disabled={mutation.isLoading} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+            {mutation.isLoading ? <>Saving...</> : <><FiSave className="h-3 w-3" /> Save</>}
           </button>
         </div>
       </form>

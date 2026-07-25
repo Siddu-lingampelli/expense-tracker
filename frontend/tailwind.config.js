@@ -6,71 +6,58 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    container: {
-      center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1400px',
-      },
+    fontFamily: {
+      sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      mono: ['DM Mono', 'JetBrains Mono', 'monospace'],
     },
     extend: {
       colors: {
+        border: '#EBEBEB',
+        input: '#EBEBEB',
+        ring: '#0A0A0A',
+        background: '#FFFFFF',
+        foreground: '#0A0A0A',
         primary: {
-          DEFAULT: 'hsl(221.2 83.2% 53.3%)',
-          foreground: 'hsl(210 40% 98%)',
+          DEFAULT: '#0A0A0A',
+          foreground: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: 'hsl(215.4 16.3% 46.9%)',
-          foreground: 'hsl(210 40% 98%)',
-        },
-        destructive: {
-          DEFAULT: 'hsl(0 84.2% 60.2%)',
-          foreground: 'hsl(210 40% 98%)',
+          DEFAULT: '#F5F5F5',
+          foreground: '#0A0A0A',
         },
         muted: {
-          DEFAULT: 'hsl(210 40% 96.1%)',
-          foreground: 'hsl(215.4 16.3% 46.9%)',
+          DEFAULT: '#F9F9F9',
+          foreground: '#9E9E9E',
         },
         accent: {
-          DEFAULT: 'hsl(210 40% 96.1%)',
-          foreground: 'hsl(222.2 47.4% 11.2%)',
+          DEFAULT: '#F5F5F5',
+          foreground: '#0A0A0A',
         },
-        popover: {
-          DEFAULT: 'hsl(0 0% 100%)',
-          foreground: 'hsl(222.2 47.4% 11.2%)',
+        destructive: {
+          DEFAULT: '#DC2626',
+          foreground: '#FFFFFF',
+        },
+        success: {
+          DEFAULT: '#16A34A',
+          foreground: '#FFFFFF',
         },
         card: {
-          DEFAULT: 'hsl(0 0% 100%)',
-          foreground: 'hsl(222.2 47.4% 11.2%)',
+          DEFAULT: '#FFFFFF',
+          foreground: '#0A0A0A',
         },
-        border: 'hsl(214.3 31.8% 91.4%)',
-        input: 'hsl(214.3 31.8% 91.4%)',
-        ring: 'hsl(221.2 83.2% 53.3%)',
-        background: 'hsl(0 0% 100%)',
-        foreground: 'hsl(222.2 47.4% 11.2%)',
       },
       borderRadius: {
         lg: '0.5rem',
-        md: 'calc(0.5rem - 2px)',
-        sm: 'calc(0.5rem - 4px)',
+        md: '0.375rem',
+        sm: '0.25rem',
       },
-      keyframes: {
-        'accordion-down': {
-          from: { height: 0 },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
-        },
+      spacing: {
+        '18': '4.5rem',
       },
-      animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+      fontSize: {
+        '2xs': '0.625rem',
       },
     },
   },
-  plugins: [
-    require('tailwindcss-animate'),
-  ],
+  plugins: [require('tailwindcss-animate')],
 }

@@ -1,26 +1,17 @@
 import { Link } from 'react-router-dom';
-import { HomeIcon } from '@heroicons/react/24/outline';
+import { FiArrowLeft } from 'react-icons/fi';
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-md w-full text-center">
-        <div className="mb-8">
-          <h1 className="text-9xl font-bold text-gray-300 dark:text-gray-700">404</h1>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-4">
-            Page Not Found
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            The page you're looking for doesn't exist or has been moved.
-          </p>
-        </div>
-        
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="text-center">
+        <p className="text-5xl font-light text-foreground mb-4">404</p>
+        <p className="text-sm text-secondary-foreground mb-6">Page not found</p>
         <Link
           to="/"
-          className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-foreground underline underline-offset-2 hover:no-underline"
         >
-          <HomeIcon className="h-5 w-5" />
-          Back to Dashboard
+          <FiArrowLeft className="h-3 w-3" /> Go home
         </Link>
       </div>
     </div>

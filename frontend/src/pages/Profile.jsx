@@ -1,298 +1,145 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserIcon, CogIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FiUser, FiLock, FiLogOut, FiMoon, FiSun } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
 
+const currencies = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+];
+
 const Profile = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('profile');
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    currency: user?.currency || 'USD',
-  });
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-
   const queryClient = useQueryClient();
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await api.put('/user/profile', data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['user']);
-      toast.success('Profile updated successfully');
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update profile');
-    },
+  const [profileForm, setProfileForm] = useState({ name: user?.name || '', email: user?.email || '', currency: user?.currency || 'USD' });
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+  const profileMutation = useMutation({
+    mutationFn: async (d) => { const r = await api.put('/user/profile', d); return r.data; },
+    onSuccess: () => { queryClient.invalidateQueries(['user']); toast.success('Profile updated'); },
+    onError: (e) => toast.error(e.response?.data?.message || 'Failed'),
   });
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await api.put('/auth/updatepassword', {
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success('Password updated successfully');
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update password');
-    },
+  const passwordMutation = useMutation({
+    mutationFn: async (d) => { const r = await api.put('/auth/updatepassword', { currentPassword: d.currentPassword, newPassword: d.newPassword }); return r.data; },
+    onSuccess: () => { toast.success('Password updated'); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); },
+    onError: (e) => toast.error(e.response?.data?.message || 'Failed'),
   });
 
-  const handleProfileSubmit = (e) => {
-    e.preventDefault();
-    updateProfileMutation.mutate(formData);
-  };
+  const handleProfileSubmit = (e) => { e.preventDefault(); profileMutation.mutate(profileForm); };
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    if (passwordData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
-    }
-    updatePasswordMutation.mutate(passwordData);
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) { toast.error('Passwords do not match'); return; }
+    if (passwordForm.newPassword.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+    passwordMutation.mutate(passwordForm);
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-    } catch (error) {
-      toast.error('Failed to logout');
-    }
-  };
+  const handleLogout = async () => { await logout(); toast.success('Logged out'); };
 
-  const currencies = [
-    { code: 'USD', name: 'US Dollar', symbol: '$' },
-    { code: 'EUR', name: 'Euro', symbol: '€' },
-    { code: 'GBP', name: 'British Pound', symbol: '£' },
-    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-    { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
-    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  const tabs = [
+    { id: 'profile', label: 'Profile', icon: FiUser },
+    { id: 'security', label: 'Security', icon: FiLock },
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
-
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'profile'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <UserIcon className="h-5 w-5 inline mr-2" />
-            Profile
-          </button>
-          <button
-            onClick={() => setActiveTab('security')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'security'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <CogIcon className="h-5 w-5 inline mr-2" />
-            Security
-          </button>
-        </nav>
+    <div className="max-w-lg mx-auto space-y-6">
+      <div>
+        <h1 className="text-base font-medium text-foreground">Settings</h1>
+        <p className="text-xs text-secondary-foreground mt-0.5">Manage your account and preferences</p>
       </div>
 
-      {/* Profile Tab */}
+      <div className="flex items-center gap-1 border border-border rounded-md p-0.5">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm transition-colors ${
+              activeTab === t.id ? 'bg-foreground text-background' : 'text-secondary-foreground hover:text-foreground'
+            }`}
+          >
+            <t.icon className="h-3.5 w-3.5" /> {t.label}
+          </button>
+        ))}
+      </div>
+
       {activeTab === 'profile' && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Profile Information
-          </h2>
-          
-          <form onSubmit={handleProfileSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Currency
-                </label>
-                <select
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  {currencies.map((currency) => (
-                    <option key={currency.code} value={currency.code}>
-                      {currency.code} - {currency.name} ({currency.symbol})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Theme
-                </label>
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-between"
-                >
-                  <span className="flex items-center gap-2">
-                    {theme === 'dark' ? (
-                      <>
-                        <MoonIcon className="h-5 w-5" />
-                        Dark Mode
-                      </>
-                    ) : (
-                      <>
-                        <SunIcon className="h-5 w-5" />
-                        Light Mode
-                      </>
-                    )}
-                  </span>
-                </button>
-              </div>
+        <div className="border border-border rounded-md p-4">
+          <h2 className="text-xs font-medium text-foreground mb-4">Profile Information</h2>
+          <form onSubmit={handleProfileSubmit} className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-foreground">Name</label>
+              <input type="text" value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required />
             </div>
-
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={updateProfileMutation.isLoading}
-                className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark disabled:opacity-50"
-              >
-                {updateProfileMutation.isLoading ? 'Saving...' : 'Save Changes'}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-foreground">Email</label>
+              <input type="email" value={profileForm.email} onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-foreground">Currency</label>
+              <select value={profileForm.currency} onChange={(e) => setProfileForm({ ...profileForm, currency: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
+                {currencies.map(c => <option key={c.code} value={c.code}>{c.code} &mdash; {c.name} ({c.symbol})</option>)}
+              </select>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-2 text-xs text-secondary-foreground">
+                {theme === 'dark' ? <FiMoon className="h-3.5 w-3.5" /> : <FiSun className="h-3.5 w-3.5" />}
+                {theme === 'dark' ? 'Dark mode' : 'Light mode'}
+              </div>
+              <button type="button" onClick={toggleTheme} className={`relative w-9 h-5 rounded-full transition-colors ${theme === 'dark' ? 'bg-foreground' : 'bg-border'}`}>
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${theme === 'dark' ? 'translate-x-4' : ''}`} />
+              </button>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+                {profileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Security Tab */}
       {activeTab === 'security' && (
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Change Password
-            </h2>
-            
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
+        <div className="space-y-4">
+          <div className="border border-border rounded-md p-4">
+            <h2 className="text-xs font-medium text-foreground mb-4">Change Password</h2>
+            <form onSubmit={handlePasswordSubmit} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">Current Password</label>
+                <input type="password" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                  minLength={6}
-                />
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">New Password</label>
+                <input type="password" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required minLength={6} />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                  minLength={6}
-                />
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">Confirm New Password</label>
+                <input type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required minLength={6} />
               </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={updatePasswordMutation.isLoading}
-                  className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark disabled:opacity-50"
-                >
-                  {updatePasswordMutation.isLoading ? 'Updating...' : 'Update Password'}
+              <div className="flex justify-end pt-2">
+                <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+                  {passwordMutation.isLoading ? 'Updating...' : 'Update'}
                 </button>
               </div>
             </form>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Account Actions
-            </h2>
-            
-            <div className="space-y-4">
-              <button
-                onClick={handleLogout}
-                className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </div>
+          <div className="border border-border rounded-md p-4">
+            <h2 className="text-xs font-medium text-foreground mb-4">Account</h2>
+            <button onClick={handleLogout} className="inline-flex items-center gap-1.5 text-xs font-medium text-destructive hover:underline underline-offset-2">
+              <FiLogOut className="h-3.5 w-3.5" /> Sign out
+            </button>
           </div>
         </div>
       )}

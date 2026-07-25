@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiDollarSign, FiPieChart, FiTag, FiShield, FiSmartphone, FiBarChart2, FiTrendingUp, FiCheck, FiStar } from 'react-icons/fi';
+import { FiArrowRight, FiDollarSign, FiPieChart, FiTag, FiShield, FiSmartphone, FiBarChart2, FiCheck } from 'react-icons/fi';
 import { useInView } from '../hooks/useInView';
 
 const features = [
@@ -100,10 +100,6 @@ const Home = () => {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-16 md:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="animate-fade-in">
-            <div className="inline-flex items-center gap-1.5 bg-primary/5 border border-primary/10 rounded-full px-3 py-1 mb-6">
-              <FiTrendingUp className="h-3 w-3 text-primary" />
-              <span className="text-2xs font-medium text-primary tracking-wide">100% LOCAL — NO CLOUD</span>
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-foreground leading-[1.1] mb-5">
               Track expenses{' '}
               <span className="relative whitespace-nowrap">
@@ -203,27 +199,6 @@ const Home = () => {
               </StaggerChild>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="border-t border-border py-20 md:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeSection className="max-w-2xl mx-auto text-center">
-            <div className="w-9 h-9 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center mx-auto mb-5">
-              <FiStar className="h-4 w-4 text-primary" />
-            </div>
-            <blockquote className="text-base md:text-lg text-foreground font-light leading-relaxed mb-6">
-              &ldquo;Everything stays in my browser. No servers, no sign-up anxiety, no &lsquo;we&rsquo;ll email you&rsquo; nonsense. 
-              It&rsquo;s just a page that respects my privacy and does exactly what it says.&rdquo;
-            </blockquote>
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-2xs font-medium text-primary-foreground">Y</div>
-              <div className="text-left">
-                <p className="text-xs font-medium text-foreground">— Someone who values privacy</p>
-                <p className="text-2xs text-secondary-foreground">Satisfied user</p>
-              </div>
-            </div>
-          </FadeSection>
         </div>
       </section>
 

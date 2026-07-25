@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FiUser, FiLock, FiLogOut, FiMoon, FiSun } from 'react-icons/fi';
+import { FiUser, FiLock, FiLogOut } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
@@ -18,7 +18,6 @@ const currencies = [
 
 const Profile = () => {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('profile');
   const queryClient = useQueryClient();
 
@@ -91,15 +90,6 @@ const Profile = () => {
               <select value={profileForm.currency} onChange={(e) => setProfileForm({ ...profileForm, currency: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1">
                 {currencies.map(c => <option key={c.code} value={c.code}>{c.code} &mdash; {c.name} ({c.symbol})</option>)}
               </select>
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-2 text-xs text-secondary-foreground">
-                {theme === 'dark' ? <FiMoon className="h-3.5 w-3.5" /> : <FiSun className="h-3.5 w-3.5" />}
-                {theme === 'dark' ? 'Dark mode' : 'Light mode'}
-              </div>
-              <button type="button" onClick={toggleTheme} className={`relative w-9 h-5 rounded-full transition-colors ${theme === 'dark' ? 'bg-foreground' : 'bg-border'}`}>
-                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${theme === 'dark' ? 'translate-x-4' : ''}`} />
-              </button>
             </div>
             <div className="flex justify-end pt-2">
               <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 active:scale-[0.97] transition-all duration-150 disabled:opacity-50">

@@ -1,8 +1,7 @@
 import { Outlet, useNavigate, useLocation, Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../context/ThemeContext';
-import { FiDollarSign, FiPieChart, FiTag, FiUser, FiLogOut, FiMoon, FiSun, FiMenu, FiX, FiGrid } from 'react-icons/fi';
+import { FiDollarSign, FiPieChart, FiTag, FiUser, FiLogOut, FiMenu, FiX, FiGrid } from 'react-icons/fi';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: FiGrid },
@@ -14,7 +13,6 @@ const navItems = [
 
 const Layout = () => {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -82,14 +80,7 @@ const Layout = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-md text-secondary-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
-              >
-                {theme === 'dark' ? <FiSun className="h-4 w-4" /> : <FiMoon className="h-4 w-4" />}
-              </button>
-
-              <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-border">
+              <div className="hidden sm:flex items-center gap-2 border-r border-border pr-2">
                 <div className="w-7 h-7 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-medium">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>

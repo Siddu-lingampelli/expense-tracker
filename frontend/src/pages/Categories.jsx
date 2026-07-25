@@ -5,21 +5,21 @@ import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
 const defaultCategories = [
-  { name: 'Food & Dining', type: 'expense', color: '#EF4444', icon: '🍽️' },
-  { name: 'Transportation', type: 'expense', color: '#F59E0B', icon: '🚗' },
-  { name: 'Shopping', type: 'expense', color: '#8B5CF6', icon: '🛍️' },
-  { name: 'Entertainment', type: 'expense', color: '#EC4899', icon: '🎬' },
-  { name: 'Bills & Utilities', type: 'expense', color: '#6B7280', icon: '💡' },
-  { name: 'Healthcare', type: 'expense', color: '#10B981', icon: '🏥' },
-  { name: 'Salary', type: 'income', color: '#059669', icon: '💼' },
-  { name: 'Freelance', type: 'income', color: '#0891B2', icon: '💻' },
-  { name: 'Investment', type: 'income', color: '#7C3AED', icon: '📈' },
+  { name: 'Food & Dining', type: 'expense', color: '#EF4444' },
+  { name: 'Transportation', type: 'expense', color: '#F59E0B' },
+  { name: 'Shopping', type: 'expense', color: '#8B5CF6' },
+  { name: 'Entertainment', type: 'expense', color: '#EC4899' },
+  { name: 'Bills & Utilities', type: 'expense', color: '#6B7280' },
+  { name: 'Healthcare', type: 'expense', color: '#10B981' },
+  { name: 'Salary', type: 'income', color: '#059669' },
+  { name: 'Freelance', type: 'income', color: '#0891B2' },
+  { name: 'Investment', type: 'income', color: '#7C3AED' },
 ];
 
 const Categories = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: '', type: 'expense', color: '#3B82F6', icon: '💰' });
+  const [form, setForm] = useState({ name: '', type: 'expense', color: '#3B82F6' });
   const queryClient = useQueryClient();
 
   const { data: categories, isLoading } = useQuery({
@@ -51,11 +51,11 @@ const Categories = () => {
     else createMutation.mutate(form);
   };
 
-  const handleEdit = (cat) => { setEditing(cat); setForm({ name: cat.name, type: cat.type, color: cat.color, icon: cat.icon }); setModalOpen(true); };
+  const handleEdit = (cat) => { setEditing(cat); setForm({ name: cat.name, type: cat.type, color: cat.color }); setModalOpen(true); };
 
   const handleDelete = (id) => { if (window.confirm('Delete this category?')) deleteMutation.mutate(id); };
 
-  const handleClose = () => { setModalOpen(false); setEditing(null); setForm({ name: '', type: 'expense', color: '#3B82F6', icon: '💰' }); };
+  const handleClose = () => { setModalOpen(false); setEditing(null); setForm({ name: '', type: 'expense', color: '#3B82F6' }); };
 
   const display = categories?.length > 0 ? categories : defaultCategories;
 
@@ -77,7 +77,7 @@ const Categories = () => {
         {display.map((cat, i) => (
           <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
             <div className="flex items-center gap-3 min-w-0">
-              <span className="text-lg flex-shrink-0">{cat.icon}</span>
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
               <div className="min-w-0">
                 <p className="text-sm text-foreground truncate">{cat.name}</p>
                 <p className="text-2xs text-secondary-foreground capitalize">{cat.type}</p>
@@ -109,15 +109,9 @@ const Categories = () => {
                   <option value="income">Income</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Color</label>
-                  <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="block w-full h-9 rounded-md border border-input bg-background p-0.5 cursor-pointer" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-foreground">Icon</label>
-                  <input type="text" value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" placeholder="💰" />
-                </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-foreground">Color</label>
+                <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="block w-full h-9 rounded-md border border-input bg-background p-0.5 cursor-pointer" />
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={handleClose} className="flex-1 px-4 py-2 text-xs font-medium text-secondary-foreground hover:text-foreground transition-colors border border-border rounded-md">Cancel</button>

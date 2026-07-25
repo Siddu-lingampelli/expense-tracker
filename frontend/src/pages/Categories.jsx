@@ -68,14 +68,14 @@ const Categories = () => {
           <h1 className="text-base font-medium text-foreground">Categories</h1>
           <p className="text-xs text-secondary-foreground mt-0.5">Manage your transaction categories</p>
         </div>
-        <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 transition-opacity">
+        <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150">
           <FiPlus className="h-3 w-3" /> Add
         </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {display.map((cat, i) => (
-          <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between">
+          <div key={cat._id || i} className="border border-border rounded-md p-3 flex items-center justify-between group hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-lg flex-shrink-0">{cat.icon}</span>
               <div className="min-w-0">

@@ -102,7 +102,7 @@ const Profile = () => {
               </button>
             </div>
             <div className="flex justify-end pt-2">
-              <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+              <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 active:scale-[0.97] transition-all duration-150 disabled:opacity-50">
                 {profileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
@@ -128,7 +128,7 @@ const Profile = () => {
                 <input type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-1" required minLength={6} />
               </div>
               <div className="flex justify-end pt-2">
-                <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+                <button type="submit" className="px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 active:scale-[0.97] transition-all duration-150 disabled:opacity-50">
                   {passwordMutation.isLoading ? 'Updating...' : 'Update'}
                 </button>
               </div>

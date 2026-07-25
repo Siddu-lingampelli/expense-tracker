@@ -84,7 +84,7 @@ const Transactions = () => {
         </div>
         <Link
           to="/dashboard/transactions/new"
-          className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-1.5 bg-foreground text-background text-xs font-medium rounded-md px-3 py-1.5 hover:opacity-90 active:scale-[0.97] transition-all duration-150"
         >
           <FiPlus className="h-3 w-3" /> Add
         </Link>
@@ -145,7 +145,7 @@ const Transactions = () => {
         ) : data?.transactions?.length > 0 ? (
           <div>
             {data.transactions.map((t) => (
-              <div key={t._id} className={`flex items-center justify-between px-4 py-3 border-b border-border last:border-b-0 hover:bg-secondary/30 transition-colors ${selected.includes(t._id) ? 'bg-secondary/50' : ''}`}>
+              <div key={t._id} className={`flex items-center justify-between px-4 py-3 border-b border-border last:border-b-0 hover:bg-secondary/40 transition-colors duration-150 ${selected.includes(t._id) ? 'bg-secondary/50' : ''}`}>
                 <div className="flex items-center gap-3 min-w-0">
                   <input
                     type="checkbox"

@@ -138,7 +138,7 @@ const EditTransaction = () => {
 
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={() => navigate('/dashboard/transactions')} className="px-4 py-2 text-xs font-medium text-secondary-foreground hover:text-foreground transition-colors border border-border rounded-md">Cancel</button>
-          <button type="submit" disabled={mutation.isLoading} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 transition-opacity disabled:opacity-50">
+            <button type="submit" disabled={mutation.isLoading} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:opacity-90 active:scale-[0.97] transition-all duration-150 disabled:opacity-50">
             {mutation.isLoading ? <>Saving...</> : <><FiSave className="h-3 w-3" /> Update</>}
           </button>
         </div>
